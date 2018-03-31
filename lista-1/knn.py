@@ -5,6 +5,9 @@ class kNearestNeighborhood:
 	with_weight = False
 	train_data = []
 	train_categories = []
+	attrFrequency = [{}]
+	classCount = {}
+	attrFrequencyByClass = {{}}
 
 	def __init__(self, neighbors,with_weight=False):
 		self.neighbors = neighbors
@@ -13,6 +16,26 @@ class kNearestNeighborhood:
 	def train(self,train_data):
 		if self.neighbors > len(train_data):
 			raise ValueError
+		for data in train_data:
+			# aumento a frequencia de cada atributo que a data tem
+			for i in range(len(data) - 1):
+				if type(data[i]) is str: 
+					if data[i] in attrFrequency[i]:
+						attrFrequency[i][data[i]] += 1
+					else:
+						attrFrequency[i][data[i]] = 1
+
+					if data[i] in attrFrequencyByClass[data[-1]][i][data[i]]:
+						attrFrequencyByClass[data[-1]][i][data[i]] += 1
+					else: 
+						attrFrequencyByClass[data[-1]][i][data[i]] = 1
+
+			#aumento a frequencia da classe
+			if data[-1] in classCount:
+				classCount[data[-1]] += 1
+			else:
+				classCount[data[-1]] = 1
+
 		self.train_data = train_data
 
 	def getNeighbors(self,instance):
@@ -37,12 +60,18 @@ class kNearestNeighborhood:
 
 			for neighbor in nearest_neighbors:
 				if neighbor[-1] in classVotes:
-					classVotes[neighbor[-1]] += 1
+					if self.with_weight:
+						classVotes[neighbor[-1]] += 1/(euclidian_distance(data,neighbor) + 0.1)
+					else:
+						classVotes[neighbor[-1]] += 1
 				else:
-					classVotes[neighbor[-1]] = 1
+					if self.with_weight:
+						classVotes[neighbor[-1]] = 1/(euclidian_distance(data,neighbor) + 0.1)
+					else:
+						classVotes[neighbor[-1]] = 1
 
 			sortedClass = sorted(classVotes.items(), key=lambda x : x[1], reverse = True)
-			
+
 			predictions.append(sortedClass[0][0])
 
 			if sortedClass[0][0] == data[-1]:

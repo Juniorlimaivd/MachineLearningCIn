@@ -20,7 +20,7 @@ def kFoldCrossValidation(dataFrame, kfold, k):
 			else:
 				trainingSet += partitions[j]
 
-		knn = kNearestNeighborhood(k)
+		knn = kNearestNeighborhood(k,True)
 		knn.train(trainingSet)
 		accuracy, predictions = knn.predict(testSet)
 
