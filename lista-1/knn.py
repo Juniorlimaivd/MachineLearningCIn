@@ -8,45 +8,48 @@ class kNearestNeighborhood:
 
 	def __init__(self, neighbors,with_weight=False):
 		self.neighbors = neighbors
-		self.withWeight = withWeight
+		self.with_weight = with_weight
 
-	def train(train_data):
-		if k > len(train_data):
+	def train(self,train_data):
+		if self.neighbors > len(train_data):
 			raise ValueError
 		self.train_data = train_data
+
+	def getNeighbors(self,instance, train_data):
+		
+		sorted_data = sorted(train_data, key=lambda current : euclidian_distance(instance,current))
+		
+		nearest_neighbors = []
+
+		for i in range(self.neighbors):
+			nearest_neighbors.append(sorted_data[i])
+
+		return nearest_neighbors
 	
-	def predict(test_data):
+	def predict(self,test_data):
+		
 		hits = 0
 		predictions = []
-		for i in len(test_data):
-			nearest_neighbors = getNeighbors(test_data[i], self.train_data)
+		for i in range(len(test_data)):
+			nearest_neighbors = self.getNeighbors(test_data[i], self.train_data)
 
 			classMeasurements = {}
 
-			for i in len(nearest_neighbors):
+			for i in range(len(nearest_neighbors)):
 				if nearest_neighbors[i][-1] in classMeasurements:
 					classMeasurements[nearest_neighbors[i][-1]] += 1
 				else:
 					classMeasurements[nearest_neighbors[i][-1]] = 1
 
-
 			sortedClass = sorted(classMeasurements.items(), key=lambda x : x[1])
 
 			predictions.append(sortedClass[0][0])
 
-			if sortedClass[0][0] == test_data[-1]:
+			if sortedClass[0][0] == test_data[i][-1]:
 				hits += 1
 
 		accuracy = 100.0*hits/len(test_data)
 		
 		return (accuracy, predictions)
 
-	def getNeighbors(instance, train_data):
-		sorted_data = train_data.sort(key=lambda current : euclidian_distance(instance,current))
-
-		nearest_neighbors = []
-
-		for i in range(k):
-			nearest_neighbors.append(sorted_data[i])
-
-		return nearest_neighbors
+	
