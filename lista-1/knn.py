@@ -41,7 +41,7 @@ class kNearestNeighborhood:
 				else:
 					classMeasurements[nearest_neighbors[i][-1]] = 1
 
-			sortedClass = sorted(classMeasurements.items(), key=lambda x : x[1])
+			sortedClass = sorted(classMeasurements.items(), key=lambda x : x[1], reverse = True)
 
 			predictions.append(sortedClass[0][0])
 
