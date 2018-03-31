@@ -15,10 +15,9 @@ class kNearestNeighborhood:
 			raise ValueError
 		self.train_data = train_data
 
-	def getNeighbors(self,instance, train_data):
-		
-		sorted_data = sorted(train_data, key=lambda current : euclidian_distance(instance,current))
-		
+	def getNeighbors(self,instance):
+		sorted_data = sorted(self.train_data, key=lambda current : euclidian_distance(instance,current))
+
 		nearest_neighbors = []
 
 		for i in range(self.neighbors):
@@ -30,25 +29,27 @@ class kNearestNeighborhood:
 		
 		hits = 0
 		predictions = []
-		for i in range(len(test_data)):
-			nearest_neighbors = self.getNeighbors(test_data[i], self.train_data)
+		
+		for data in test_data:
+			nearest_neighbors = self.getNeighbors(data)
 
-			classMeasurements = {}
+			classVotes = {}
 
-			for i in range(len(nearest_neighbors)):
-				if nearest_neighbors[i][-1] in classMeasurements:
-					classMeasurements[nearest_neighbors[i][-1]] += 1
+			for neighbor in nearest_neighbors:
+				if neighbor[-1] in classVotes:
+					classVotes[neighbor[-1]] += 1
 				else:
-					classMeasurements[nearest_neighbors[i][-1]] = 1
+					classVotes[neighbor[-1]] = 1
 
-			sortedClass = sorted(classMeasurements.items(), key=lambda x : x[1], reverse = True)
-
+			sortedClass = sorted(classVotes.items(), key=lambda x : x[1], reverse = True)
+			
 			predictions.append(sortedClass[0][0])
 
-			if sortedClass[0][0] == test_data[i][-1]:
+			if sortedClass[0][0] == data[-1]:
 				hits += 1
 
-		accuracy = 100.0*hits/len(test_data)
+
+		accuracy = 100.0*float(hits)/float(len(test_data))
 		
 		return (accuracy, predictions)
 
