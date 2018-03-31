@@ -22,7 +22,7 @@ def getPartitions(dataFrame, k):
 
 		# partitions[i].append(entry)
 		
-		partitions[index].append(dataFrame.values[index])
+		partitions[index].append(dataFrame.values[i])
 
 		if len(partitions[index]) >= sizePerFold:
 			index += 1
@@ -32,8 +32,7 @@ def getPartitions(dataFrame, k):
 def kFoldCrossValidation(dataFrame, k):
 
 	partitions = getPartitions(dataFrame, k)
-	for i in partitions:
-		print(len(i))
+	print(partitions[0])
 
 	# data = df.values[:df.shape[0] - 2]
 	# size = data.shape[0]
