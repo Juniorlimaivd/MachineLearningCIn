@@ -5,7 +5,7 @@ def euclidian_distance(first, second):
 		raise ValueError
 
 	distance = 0
-	for i in len(first):
+	for i in len(first) - 1 : #to avoid the class
 		distance += pow(first[i] - second[i], 2)
 
 	return math.sqrt(distance)
