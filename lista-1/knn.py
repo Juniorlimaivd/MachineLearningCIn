@@ -41,9 +41,9 @@ class kNearestNeighborhood:
 					if data[i] < self.minAttr[i]:
 						self.minAttr[i] = data[i]
 				
-				# calculo os ranges para normalized_euclidian_distance
-				for i in range(len(self.minAttr)):
-				    self.ranges[i] = self.maxAttr[i] - self.minAttr[i]
+			# calculo os ranges para normalized_euclidian_distance
+			for i in range(len(self.minAttr)):
+				self.ranges[i] = self.maxAttr[i] - self.minAttr[i]
 				
 		elif self.db_type == 'categorical':
 			for data in train_data:
@@ -68,6 +68,10 @@ class kNearestNeighborhood:
 					self.classCount[data[-1]] = 1
 				
 		elif self.db_type == 'hybrid':
+			self.maxAttr = [-1 for i in range(len(train_data[0]) - 1)]
+			self.minAttr = [999999 for i in range(len(train_data[0]) - 1)]
+			self.ranges = [0 for i in range(len(train_data[0]) - 1)]
+			
 			for data in train_data:
 				for i in range(len(data) - 1):
 					if type(data[i]) is str:
@@ -82,6 +86,15 @@ class kNearestNeighborhood:
 							self.attrFrequencyByClass[(data[-1], i, data[i])] += 1
 						else:
 							self.attrFrequencyByClass[(data[-1], i, data[i])] = 1
+					else:
+						if data[i] > self.maxAttr[i]:
+							self.maxAttr[i] = float(data[i])
+						if data[i] < self.minAttr[i]:
+							self.minAttr[i] = float(data[i])
+			
+			for i in range(len(self.minAttr)):
+				self.ranges[i] = self.maxAttr[i] - self.minAttr[i]
+			
 		else:
 			raise ValueError
 
@@ -92,14 +105,18 @@ class kNearestNeighborhood:
 																			current, 
 																			self.classCount, 
 																			self.attrFrequency, 
-																			self.attrFrequencyByClass, 1))
+																			self.attrFrequencyByClass, 
+																			1))
 		elif self.db_type == 'numeric':
 			sorted_data = sorted(self.train_data, key= lambda current: euclidian_distance(current, instance))
 		elif self.db_type == 'hybrid':
-			sorted_data = sorted(self.train_data, key= lambda current: HVDM(current, 
-																			instance, self.classCount, 
+			sorted_data = sorted(self.train_data, key= lambda current: HVDM(instance, 
+																			current, 
+																			self.classCount, 
 																			self.attrFrequency, 
-																			self.attrFrequencyByClass,1))
+																			self.attrFrequencyByClass,
+																			self.ranges,
+																			1))
 		nearest_neighbors = []
 
 		for i in range(self.neighbors):

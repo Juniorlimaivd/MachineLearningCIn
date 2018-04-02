@@ -18,7 +18,7 @@ def kFoldCrossValidation(dataFrame, kfold, k):
 			else:
 				trainingSet += partitions[j]
 
-		knn = kNearestNeighborhood(k, 'categorical')
+		knn = kNearestNeighborhood(k, 'hybrid')
 		knn.train(trainingSet)
 		accuracy, _ = knn.predict(testSet)
 
@@ -28,8 +28,9 @@ def kFoldCrossValidation(dataFrame, kfold, k):
 
 
 if __name__ == '__main__':
-	#data = arff.loadarff('kc2.arff')
-	df = pd.read_csv('chess.csv')
+	data = arff.loadarff('german-credito.arff')
+	df = pd.DataFrame(data[0])
+	# df = pd.read_csv('tictactoe.csv')
 	kArray = [1, 2, 3, 5, 7, 9, 11, 13, 15]
 
 	for k in kArray:
