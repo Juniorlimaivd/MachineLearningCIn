@@ -21,6 +21,9 @@ class kNearestNeighborhood:
 		self.neighbors = neighbors
 		self.with_weight = with_weight
 		self.db_type = db_type
+		self.attrFrequency = {}
+		self.attrFrequencyByClass = {}
+		self.classCount = {}
 
 	def train(self, train_data):
 		if self.neighbors > len(train_data):
@@ -34,14 +37,14 @@ class kNearestNeighborhood:
 			self.ranges = [0 for i in range(len(train_data[0]) - 1)]
 
 			for data in train_data:
-				# get max and min for normalized_euclidian_distance
+
 				for i in range(len(data) - 1):
 					if data[i] > self.maxAttr[i]:
 						self.maxAttr[i] = data[i]
 					if data[i] < self.minAttr[i]:
 						self.minAttr[i] = data[i]
 				
-			# calculo os ranges para normalized_euclidian_distance
+
 			for i in range(len(self.minAttr)):
 				self.ranges[i] = self.maxAttr[i] - self.minAttr[i]
 				
@@ -74,7 +77,7 @@ class kNearestNeighborhood:
 			
 			for data in train_data:
 				for i in range(len(data) - 1):
-					if type(data[i]) is str:
+					if isinstance(data[i],str):
 						# aumento a frequencia do valor para o atributo i
 						if (i, data[i]) in self.attrFrequency:
 							self.attrFrequency[(i, data[i])] += 1
@@ -86,6 +89,12 @@ class kNearestNeighborhood:
 							self.attrFrequencyByClass[(data[-1], i, data[i])] += 1
 						else:
 							self.attrFrequencyByClass[(data[-1], i, data[i])] = 1
+
+								# aumento a frequencia da classe
+						if data[-1] in self.classCount:
+							self.classCount[data[-1]] += 1
+						else:
+							self.classCount[data[-1]] = 1
 					else:
 						if data[i] > self.maxAttr[i]:
 							self.maxAttr[i] = float(data[i])
@@ -99,7 +108,7 @@ class kNearestNeighborhood:
 			raise ValueError
 
 	def getNeighbors(self, instance):
-
+		
 		if self.db_type == 'categorical': 
 			sorted_data = sorted(self.train_data, key=lambda current: VDM(instance, 
 																			current, 
@@ -114,9 +123,10 @@ class kNearestNeighborhood:
 																			current, 
 																			self.classCount, 
 																			self.attrFrequency, 
-																			self.attrFrequencyByClass,
-																			self.ranges,
+																			self.attrFrequencyByClass, 
+																			self.ranges, 
 																			1))
+			
 		nearest_neighbors = []
 
 		for i in range(self.neighbors):
@@ -125,7 +135,7 @@ class kNearestNeighborhood:
 		return nearest_neighbors
 
 	def predict(self, test_data):
-
+		
 		hits = 0
 		predictions = []
 
@@ -137,14 +147,45 @@ class kNearestNeighborhood:
 			for current in nearest_neighbors:
 				if current[-1] in classVotes:
 					if self.with_weight:
-						classVotes[current[-1]] += 1 / pow(
-							euclidian_distance(data, current) + 0.00000001, 2)
+						if self.db_type == 'categorical':
+							classVotes[current[-1]] += 1 / VDM(data, 
+																current,
+																self.classCount,
+																self.attrFrequency,
+																self.attrFrequencyByClass,
+																1)
+						elif self.db_type == 'numeric':
+							classVotes[current[-1]] += 1 / pow( euclidian_distance(data, current) + 0.00000001, 2)
+						elif self.db_type == 'hybrid':
+							classVotes[current[-1]] += 1 / HVDM(data, 
+																current,
+																self.classCount,
+																self.attrFrequency,
+																self.attrFrequencyByClass,
+																self.ranges,
+																1)
+					
 					else:
 						classVotes[current[-1]] += 1
 				else:
 					if self.with_weight:
-						classVotes[current[-1]] = 1 / pow(
-							euclidian_distance(data, current) + 0.00000001, 2)
+						if self.db_type == 'categorical':
+							classVotes[current[-1]] = 1 / VDM(data, 
+																current,
+																self.classCount,
+																self.attrFrequency,
+																self.attrFrequencyByClass,
+																1)
+						elif self.db_type == 'numeric':
+							classVotes[current[-1]] = 1 / pow( euclidian_distance(data, current) + 0.00000001, 2)
+						elif self.db_type == 'hybrid':
+							classVotes[current[-1]] = 1 / HVDM(data, 
+																current,
+																self.classCount,
+																self.attrFrequency,
+																self.attrFrequencyByClass,
+																self.ranges,
+																1)
 					else:
 						classVotes[current[-1]] = 1
 

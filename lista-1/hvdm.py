@@ -20,17 +20,14 @@ def HVDM(instance1, instance2, classDict, attrFrequency, attrFrequencyByClass, r
             partialsum = 0          
                 
             for j in classDict.keys():
-                if (j, i, instance1[i]) not in attrFrequencyByClass:
+                if not (j, i, instance1[i]) in attrFrequencyByClass:
 				    attrFrequencyByClass[(j, i, instance1[i])] = 0
-                if (j, i, instance2[i]) not in attrFrequencyByClass:
+                if not (j, i, instance2[i]) in attrFrequencyByClass:
 				    attrFrequencyByClass[(j, i, instance2[i])] = 0
 
-                partialsum += pow(
-				abs((float(attrFrequencyByClass[(j, i, instance1[i])]) / float(attrFrequency[(i, instance1[i])])) 
-                - (float(attrFrequencyByClass[(j, i, instance2[i])]) / float(attrFrequency[(i, instance2[i])]))), q)
-
-            distance += partialsum ** 2
+                partialsum += pow(abs((float(attrFrequencyByClass[(j, i, instance1[i])]) / float(attrFrequency[(i, instance1[i])])) - (float(attrFrequencyByClass[(j, i, instance2[i])]) / float(attrFrequency[(i, instance2[i])]))), q)
+            distance += pow(partialsum, 2)
         else:
-            distance += ( abs(float(instance1[i]) - float(instance2[i])) / float(ranges[i])) ** 2
+            distance += pow( abs(float(instance1[i]) - float(instance2[i])) / float(ranges[i]), 2)
 
     return math.sqrt(distance)
