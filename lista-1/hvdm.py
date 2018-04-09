@@ -21,9 +21,9 @@ def HVDM(instance1, instance2, classDict, attrFrequency, attrFrequencyByClass, r
                 
             for j in classDict.keys():
                 if not (j, i, instance1[i]) in attrFrequencyByClass:
-				    attrFrequencyByClass[(j, i, instance1[i])] = 0
+                    attrFrequencyByClass[(j, i, instance1[i])] = 0
                 if not (j, i, instance2[i]) in attrFrequencyByClass:
-				    attrFrequencyByClass[(j, i, instance2[i])] = 0
+                    attrFrequencyByClass[(j, i, instance2[i])] = 0
 
                 partialsum += pow(abs((float(attrFrequencyByClass[(j, i, instance1[i])]) / float(attrFrequency[(i, instance1[i])])) - (float(attrFrequencyByClass[(j, i, instance2[i])]) / float(attrFrequency[(i, instance2[i])]))), q)
             distance += pow(partialsum, 2)
