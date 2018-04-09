@@ -1,18 +1,7 @@
 from sklearn import neighbors
-import math
+from distance import euclidian_distance
+from prototype import generateRandomPrototypes
 import numpy as np
-
-def euclidian_distance(first, second):
-    if len(first) != len(second):
-        raise ValueError
-    distance = 0
-    for i in range(len(first) - 1):  # to avoid the class
-        distance += pow(first[i] - second[i], 2)
-
-    return math.sqrt(distance)
-
-def generateRandomPrototypes(data, prototypesNumber):
-    return ([],[])
 
 def isInsideWindow(test, instance1, instance2, w):
 	
@@ -29,24 +18,27 @@ def lvq1(data, prototypesNumber=10, max_epochs=10, learning_rate = 0.1):
     y = data.iloc[:, -1].values
 
     prototypes, classes = generateRandomPrototypes(data, prototypesNumber)
-    
-    for epoch in max_epochs:
-        knn = neighbors.NearestNeighbors(n_neighbors=1)
+    # print(prototypes)
+    # print(x)
+    for epoch in range(max_epochs):
+        knn = neighbors.NearestNeighbors(n_neighbors=1, n_jobs=4)
 
         knn.fit(prototypes)
         
         _, indexes = knn.kneighbors(x)
+        
         alfa = learning_rate * (1.0 - (epoch/float(max_epochs)))
-
-        for i in range(len(data)):
-            mc = prototypes[indexes[i]]
-
-            if y[i] == classes[indexes[i]]:
+        
+        for i in range(len(x)):
+            mc = prototypes[indexes[i][0]]
+            if y[i] == classes[indexes[i][0]]:
                 mc = mc + alfa*(x[i] - mc)
             else: 
                 mc = mc - alfa*(x[i] - mc)
 
-    return np.insert(prototypes, -1, classes, axis=1)    
+            prototypes[indexes[i][0]] = mc
+    print(prototypes)
+    return prototypes, classes    
         
 
 
@@ -77,7 +69,7 @@ def lvq21(data, prototypesNumber=10, max_epochs=10, learning_rate = 0.1):
 
     return np.insert(prototypes, len(prototypes)+1, classes, axis=1)
 
-def lvq3(data, prototypesNumber=10, max_epochs=10, learning_rate = 0.1, e=0.1):
+def lvq3(data, prototypesNumber=10, max_epochs=10, learning_rate=0.1, e=0.1):
     x = data.iloc[:, :-1].values
     y = data.iloc[:, -1].values    
     prototypes, classes = generateRandomPrototypes(data, prototypesNumber)
