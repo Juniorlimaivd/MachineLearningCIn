@@ -192,6 +192,10 @@ def runLVQTimeAccuracyTests(trainingSet, testSet, knn_sizes, prototypes_sizes):
     plt.clf()
 
 if __name__ == "__main__":
+
+    if len(sys.argv) < 3:
+        print("Para uso do programa, favor colocar como argumentos o caminho do dataset e o tipo de arquivo do dataset (arff ou csv)")
+        exit()
     dataFrame = loadDataset(sys.argv[1], sys.argv[2])
     dataFrame = normalize(dataFrame)
     
